@@ -20,9 +20,11 @@ public class ImageRotatorPlugin: NSObject, FlutterPlugin {
         result(FlutterError(code:"Invalid_Arguments", message: "path, angle, outputPath must not be null", details: ""))
         return
       }
-
-      rotateImage(filePath:path, angleInDegrees: angle, outputPath: outputPath)
-      result(path)
+        
+        DispatchQueue.global().async {
+            self.rotateImage(filePath:path, angleInDegrees: angle, outputPath: outputPath)
+            result(path)
+        }
     default:
       result(FlutterMethodNotImplemented)
     }
