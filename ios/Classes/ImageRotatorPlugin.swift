@@ -34,8 +34,14 @@ public class ImageRotatorPlugin: NSObject, FlutterPlugin {
   func rotateImage(filePath: String, angleInDegrees: CGFloat, outputPath: String) {
     if let image = UIImage(contentsOfFile: filePath) {
         let rotatedImage = image.rotate(radians: angleInDegrees * .pi / 180)
-
-        let rotatedImageData = rotatedImage.pngData()
+        
+        let croppedImage = rotatedImage.cropTo4x3()
+        
+        if croppedImage == nil {
+            return
+        }
+        
+        let rotatedImageData = croppedImage!.pngData()
         
         do {
             try rotatedImageData!.write(to: URL(fileURLWithPath: outputPath))
@@ -66,5 +72,32 @@ extension UIImage {
         UIGraphicsEndImageContext()
 
         return newImage
+    }
+    
+    func cropTo4x3() -> UIImage? {
+        let desiredWidth: CGFloat
+        let desiredHeight: CGFloat
+        let startX: CGFloat
+        let startY: CGFloat
+        
+        if size.width > size.height {
+            desiredWidth = size.height / 3 * 4
+            desiredHeight = size.height
+            startX = (size.width - desiredWidth) / 2
+            startY = 0
+        } else {
+            desiredWidth = size.width
+            desiredHeight = size.width / 3 * 4
+            startX = 0
+            startY = (size.height - desiredHeight) / 2
+        }
+        
+        let rect = CGRect(x: startX, y: startY, width: desiredWidth, height: desiredHeight)
+        
+        if let cgImage = cgImage?.cropping(to: rect) {
+            return UIImage(cgImage: cgImage)
+        }
+        
+        return nil
     }
 }
