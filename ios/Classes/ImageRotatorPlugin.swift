@@ -1,5 +1,7 @@
 import Flutter
 import UIKit
+import ImageIO
+import MobileCoreServices
 
 public class ImageRotatorPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -41,7 +43,7 @@ public class ImageRotatorPlugin: NSObject, FlutterPlugin {
             return
         }
         
-        let rotatedImageData = croppedImage!.pngData()
+        let rotatedImageData = croppedImage!.jpegData(compressionQuality: 1)
         
         do {
             try rotatedImageData!.write(to: URL(fileURLWithPath: outputPath))
